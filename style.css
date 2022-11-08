@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;700&display=swap');
+
+body {
+    /* Credit: https://stackoverflow.com/questions/6900124/how-to-make-certain-text-not-selectable-with-css */
+    user-select: none; /* Standard */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+}
+
+#canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: black;
+    z-index: -1;
+}
+
+.content {
+    /* Center text */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: white;
+    background-color: #505050a0;
+
+    font-family: 'Azret Mono', monospace;
+    text-align: center;
+    padding-left: 4%;
+    padding-right: 4%;
+    border-radius: 40px;
+
+    /* all lowercase cuz looks cooler B) */
+    text-transform: lowercase;
+}
+
+.controls {
+    font-size: 110%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 300px;
+
+    text-align: left;
+
+    border-style: solid;
+    border-radius: 10px;
+    border-color: #ffffff60;
+    border-spacing: medium;
+}
+
+.control-key {
+    margin-left: 10px;
+    font-style: italic;
+    text-align: right;
+}
+
+h1 {
+    font-weight: bold;
+    font-size: 64px;
+}
+
+#settings-button {
+    position: fixed;
+    left: 100%;
+    transform: translateX(-110%);
+}
