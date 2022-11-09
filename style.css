@@ -39,7 +39,7 @@ body {
 }
 
 .controls {
-    font-size: 110%;
+    font-size: 90%;
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -62,10 +62,15 @@ body {
 h1 {
     font-weight: bold;
     font-size: 64px;
+    margin-bottom: -7.5px
 }
 
 #settings-button {
     position: fixed;
     left: 100%;
     transform: translateX(-110%);
+}
+
+a {
+    color: white;
 }

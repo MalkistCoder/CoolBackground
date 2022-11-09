@@ -1,8 +1,14 @@
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
 
+// For window resize
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
+
+window.addEventListener('resize', function() {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+})
 
 // How to make right click menu not pop up, https://stackoverflow.com/questions/737022/how-do-i-disable-right-click-on-my-web-page
 canvas.addEventListener('contextmenu', event => event.preventDefault());
@@ -18,6 +24,7 @@ window.addEventListener('mousemove', function(e) {
     mouse.y = e.y
 })
 
+// For rainbow effect
 let hue = 0
 
 // Settings
@@ -27,15 +34,11 @@ let frozen = false
 
 let sizeMultiplier = 1
 let speedMultiplier = 1
-let lineWidth = 3
-
-window.addEventListener('resize', function() {
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-})
+let lineWidth = 18
 
 const twoPointsDist = (ax, ay, bx, by) => Math.sqrt((ax-bx)**2 + (ay-by)**2)
 
+// Main particle/node class
 class Particle {
     constructor(x,y) {
         this.x = x
@@ -71,6 +74,7 @@ class Particle {
         ctx.fill()
     }
 
+    // I honestly have no idea how any of this works, I just copied and pasted from google lol
     get angle() {
         return ((Math.atan2(this.vy, this.vx) * 180/Math.PI) + 90) % 360
     }
@@ -92,11 +96,13 @@ class Particle {
     }
 }
 
+// Create initial particles
 let particles = []
 for (var i = 0; i <= 125; i++) {
     particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height))
 }
 
+// Update the particles
 function updateParticles() {
     if (!frozen) {
         particles.forEach((particle, unused) => {
@@ -108,7 +114,7 @@ function updateParticles() {
             particles.forEach((connection, unused) => {
                 let dist = twoPointsDist(particle.x,particle.y,connection.x,connection.y)
                 if (dist < 150) {
-                    ctx.lineWidth = lineWidth
+                    ctx.lineWidth = 3/10*(1.125**lineWidth)
                     ctx.beginPath()
                     ctx.moveTo(particle.x, particle.y)
                     ctx.lineTo(connection.x, connection.y)
@@ -125,6 +131,13 @@ function updateParticles() {
     }
 }
 
+/* Controls to edit settings
+
+If you don't know how this works because you have skill issue basically:
+a = !a means reverse it, so true becomes false and false becomes true
+a++ or a-- means increase and decrease respecively
+
+*/
 document.addEventListener('keypress', function(e) {
     if (e.key == 'q') {
         drawLines = !drawLines
@@ -144,18 +157,21 @@ document.addEventListener('keypress', function(e) {
         toggleTitle()
     } else if (e.key == '\'') {
         lineWidth++
-    } else if (e.key == ';' && lineWidth > 1) {
+    } else if (e.key == ';' && lineWidth > -2) {
         lineWidth--
     } else {
         console.log(`Key: "${e.key}", Code: "${e.code}"`)
     }
 })
 
+// Clicking
 canvas.addEventListener('mousedown', function(e) {
     console.log(e.which, e.button)
+    // Left mouse button
     if (e.which == 1 || e.button == 1) {
         particles.push(new Particle(mouse.x,mouse.y))
     } else {
+        // Right mouse button
         particles.sort((a,b) => {
             return twoPointsDist(mouse.x,mouse.y,a.x,a.y) - twoPointsDist(mouse.x,mouse.y,b.x,b.y)
         })
@@ -165,12 +181,13 @@ canvas.addEventListener('mousedown', function(e) {
     }
 })
 
+// Animate stuff
 function animate() {
     ctx.clearRect(0,0,canvas.width,canvas.height)
-    /*ctx.fillStyle = 'white'
-    ctx.fillRect(0,0,canvas.width, canvas.height)*/
     updateParticles()
     hue = (hue + 1) % 360
+    // Call again so it loops forever
+    // BUG: different speeds on different refresh rates
     requestAnimationFrame(animate)
 }
 
