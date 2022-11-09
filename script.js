@@ -34,7 +34,7 @@ let frozen = false
 
 let sizeMultiplier = 1
 let speedMultiplier = 1
-let lineWidth = 18
+let lineWidth = 5
 
 const twoPointsDist = (ax, ay, bx, by) => Math.sqrt((ax-bx)**2 + (ay-by)**2)
 
@@ -98,7 +98,7 @@ class Particle {
 
 // Create initial particles
 let particles = []
-for (var i = 0; i <= 125; i++) {
+for (var i = 0; i <= (window.innerWidth * window.innerHeight)*0.000075; i++) { // 0.000048226 because 75 pixels per 1000*1000 pixels
     particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height))
 }
 
@@ -112,14 +112,16 @@ function updateParticles() {
     if (drawLines) {
         particles.forEach((particle, unused) => {
             particles.forEach((connection, unused) => {
-                let dist = twoPointsDist(particle.x,particle.y,connection.x,connection.y)
-                if (dist < 150) {
-                    ctx.lineWidth = 3/10*(1.125**lineWidth)
-                    ctx.beginPath()
-                    ctx.moveTo(particle.x, particle.y)
-                    ctx.lineTo(connection.x, connection.y)
-                    ctx.strokeStyle = `hsla(${hue},100%,${(100-(100*dist/300))}%,${1-(dist/150)})`
-                    ctx.stroke()
+                if (particle != connection || Math.abs(particle.x-connection.x) <= 150 || Math.abs(particle.y-connection.y) <= 150) {
+                    let dist = twoPointsDist(particle.x,particle.y,connection.x,connection.y)
+                    if (dist < 150) {
+                        ctx.lineWidth = 3/10*(1.5**lineWidth)
+                        ctx.beginPath()
+                        ctx.moveTo(particle.x, particle.y)
+                        ctx.lineTo(connection.x, connection.y)
+                        ctx.strokeStyle = `hsla(${hue},100%,${(100-(100*dist/300))}%,${1-(dist/150)})`
+                        ctx.stroke()
+                    }
                 }
             })
         })
@@ -145,23 +147,25 @@ document.addEventListener('keypress', function(e) {
         drawParticles = !drawParticles
     } else if (e.key == 's') {
         frozen = !frozen
-    } else if (e.key == '.') {
+    } else if (e.key == '.' && speedMultiplier < 6) {
         speedMultiplier++
-    } else if (e.key == ',') {
+    } else if (e.key == ',' && speedMultiplier > -4) {
         speedMultiplier--
-    } else if (e.key == ']') {
+    } else if (e.key == ']' && sizeMultiplier < 14) {
         sizeMultiplier++
-    } else if (e.key == '[' && sizeMultiplier >= -8) {
+    } else if (e.key == '[' && sizeMultiplier > -8) {
         sizeMultiplier--
-    } else if (e.key == '`') {
-        toggleTitle()
-    } else if (e.key == '\'') {
+    } else if (e.key == '\'' && lineWidth < 16) {
         lineWidth++
     } else if (e.key == ';' && lineWidth > -2) {
         lineWidth--
+    } else if (e.key == '`') {
+        toggleTitle()
     } else {
         console.log(`Key: "${e.key}", Code: "${e.code}"`)
     }
+    console.log(lineWidth)
+    updateSettingsToForm()
 })
 
 // Clicking
@@ -193,12 +197,48 @@ function animate() {
 
 // Function to hide/show title
 function toggleTitle() {
-    title = document.getElementById('content')
-    if (title.style.display == "none") {
-        title.style.display = "block"
+    const title = document.getElementById('content')
+    if (title.style.display != "none") {
+        title.style.display = "none"
     } else {
+        title.style.display = "block"
+    }
+}
+
+function toggleSettingsMenu() {
+    const settingsMenu = document.getElementsByClassName('settings')[0]
+    if (settingsMenu.style.display == "inline-block") {
+        settingsMenu.style.setProperty('display', 'none', 'important')
+    } else {
+        settingsMenu.style.setProperty('display', 'inline-block', 'important')
+    }
+    // Toggles off title if title is still there
+    const title = document.getElementById('content')
+    console.log(title.style.display)
+    if (title.style.display != "none") {
         title.style.display = "none"
     }
+}
+
+function updateSettingsFromForm() {
+    settingsMenu = document.getElementsByClassName('settings-form')[0]
+    speedMultiplier = settingsMenu.querySelector('#speedMultiplier').value
+    sizeMultiplier = settingsMenu.querySelector('#nodeSize').value
+    lineWidth = settingsMenu.querySelector('#connectionSize').value
+
+    frozen = !settingsMenu.querySelector('#notFrozen').checked
+    drawLines = settingsMenu.querySelector('#lines').checked
+    drawParticles = settingsMenu.querySelector('#nodes').checked
+}
+
+function updateSettingsToForm() {
+    settingsMenu = document.getElementsByClassName('settings-form')[0]
+    settingsMenu.querySelector('#speedMultiplier').value = speedMultiplier
+    settingsMenu.querySelector('#nodeSize').value = sizeMultiplier
+    settingsMenu.querySelector('#connectionSize').value = lineWidth
+    settingsMenu.querySelector('#notFrozen').checked = !frozen
+    settingsMenu.querySelector('#lines').checked = drawLines
+    settingsMenu.querySelector('#nodes').checked = drawParticles
 }
 
 // Start

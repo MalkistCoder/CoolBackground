@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    <!-- Copyright (c) 2022 the among us commonwealth inc All Rights Reserved. -->
     <head>
         <meta charset="utf-8">
         <title>Canvas Test</title>
@@ -8,7 +9,7 @@
     </head>
     <body>
         <div class="content" id="content">
-            <h1>Cool Background</h1>
+            <h1 class="main-header">Cool Background</h1>
             <p>By: MalkistCoder82</p>
             <p>Source: <a href="https://github.com/MalkistCoder/CoolBackground">github repo</a></p>
             <h4>Controls</h4>
@@ -69,7 +70,53 @@
             <h3>[press ` toggle this window]</h3>
             <h6>Tip: Press F11 to full-screen</h6>
         </div>
-        <button type="button" id="settings-button" onclick="">Settings</button>
+        <button type="button" id="settings-button" onclick="toggleSettingsMenu();">Settings</button>
+        <div class="settings">
+            <form class="settings-form" oninput="updateSettingsFromForm();">
+                <h1 id="settings-form-heading">Background Settings</h1>
+                <div class="settings-form-form">
+                    <table id="settings-form-table">
+                        <tr>
+                            <td>
+                                <label for="speedMultiplier">Speed: </label>
+                            </td>
+                            <td>
+                                <input type="number" name="speed" id="speedMultiplier" value="1" min="-4" max="6">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="nodeSize">Node Size: </label>
+                            </td>
+                            <td>
+                                <input type="number" name="node-size" id="nodeSize" value="1" min="-8" max="14">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="connectionSize">Connection Size:</label>
+                            </td>
+                            <td>
+                                <input type="number" name="connection-size" id="connectionSize" value="5" min="-2" max="16">
+                            </td>
+                        </tr>
+                    </table>
+                    <br>
+                    <br>
+                    <span>Movement:</span>
+                    <input type="checkbox" name="not-frozen" id="notFrozen" value="not-frozen" checked>
+                    <br>
+                    <br>
+                    <h3>Display</h3>
+                    <br>
+                    <label for="lines">Lines:</label>
+                    <input type="checkbox" name="lines" id="lines" value="lines" checked>
+                    <br>
+                    <label for="nodes">Nodes:</label>
+                    <input type="checkbox" name="nodes" id="nodes" value="nodes" checked>
+                </div>
+            </form>
+        </div>
         <canvas id="canvas"></canvas>
     </body>
 </html>
