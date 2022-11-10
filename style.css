@@ -69,7 +69,7 @@ h1 {
 }
 
 .main-header {
-    bottom: -7.5px !important;
+    margin-bottom: -7.5px;
 }
 
 a {
