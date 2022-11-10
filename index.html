@@ -71,6 +71,7 @@
             <h6>Tip: Press F11 to full-screen</h6>
         </div>
         <button type="button" id="settings-button" onclick="toggleSettingsMenu();">Settings</button>
+        <div class="overlay"></div>
         <div class="settings">
             <form class="settings-form" oninput="updateSettingsFromForm();">
                 <h1 id="settings-form-heading">Background Settings</h1>
@@ -101,12 +102,12 @@
                             </td>
                         </tr>
                     </table>
+                    <h3>Movement:</h3>
+                    <label for="frozen">Frozen</label>
+                    <input type="checkbox" name="frozen" id="frozen" value="frozen">
                     <br>
-                    <br>
-                    <span>Movement:</span>
-                    <input type="checkbox" name="not-frozen" id="notFrozen" value="not-frozen" checked>
-                    <br>
-                    <br>
+                    <!--<label for="wandering">Wandering (BETA)</label>
+                    <input type="checkbox" name="wandering" id="wandering" value="wandering">-->
                     <h3>Display</h3>
                     <br>
                     <label for="lines">Lines:</label>

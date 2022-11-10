@@ -31,10 +31,13 @@ let hue = 0
 let drawLines = true
 let drawParticles = true
 let frozen = false
+// let wandering = false
 
 let sizeMultiplier = 1
 let speedMultiplier = 1
 let lineWidth = 5
+let wanderingFrame = 0
+let targetFPS = 48
 
 const twoPointsDist = (ax, ay, bx, by) => Math.sqrt((ax-bx)**2 + (ay-by)**2)
 
@@ -80,11 +83,15 @@ class Particle {
     }
     set angle(deg) {
         const aRad = Math.PI/180 * deg
-        const vel = Math.sqrt((this.vx*this.vx)+(this.vy*this.vy))
+        const vel = this.vel
         this.vx = Math.sin(aRad) * vel * -1
         this.vy = Math.cos(aRad) * vel * -1
     }
-
+    /*
+    wander() {
+        this.angle += 10
+    }
+    */
     get vel() {
         return Math.sqrt((this.vx*this.vx)+(this.vy*this.vy))
     }
@@ -108,6 +115,13 @@ function updateParticles() {
         particles.forEach((particle, unused) => {
             particle.update()
         })
+        /*
+        if (wandering && wanderingFrame >= 5) {
+            particles.forEach((particle, i) => {
+                particle.wander()
+            });
+            wanderingFrame = 0
+        */
     }
     if (drawLines) {
         particles.forEach((particle, unused) => {
@@ -192,7 +206,9 @@ function animate() {
     hue = (hue + 1) % 360
     // Call again so it loops forever
     // BUG: different speeds on different refresh rates
-    requestAnimationFrame(animate)
+    setTimeout(function () {
+        requestAnimationFrame(animate)
+    }, 1000/targetFPS);
 }
 
 // Function to hide/show title
@@ -206,11 +222,20 @@ function toggleTitle() {
 }
 
 function toggleSettingsMenu() {
+    const overlay = document.getElementsByClassName('overlay')[0]
     const settingsMenu = document.getElementsByClassName('settings')[0]
     if (settingsMenu.style.display == "inline-block") {
-        settingsMenu.style.setProperty('display', 'none', 'important')
+        settingsMenu.style.setProperty('animation-name', 'settings-exit')
+        overlay.style.setProperty('animation-name', 'overlay-exit')
+        setTimeout(function () {
+            settingsMenu.style.setProperty('display', 'none', 'important')
+            overlay.style.setProperty('display', 'none')
+        }, 1500)
     } else {
+        settingsMenu.style.setProperty('animation-name', 'settings-entrance')
+        overlay.style.setProperty('animation-name', 'overlay-entrance')
         settingsMenu.style.setProperty('display', 'inline-block', 'important')
+        overlay.style.setProperty('display', 'inline-block')
     }
     // Toggles off title if title is still there
     const title = document.getElementById('content')
@@ -226,7 +251,8 @@ function updateSettingsFromForm() {
     sizeMultiplier = settingsMenu.querySelector('#nodeSize').value
     lineWidth = settingsMenu.querySelector('#connectionSize').value
 
-    frozen = !settingsMenu.querySelector('#notFrozen').checked
+    frozen = settingsMenu.querySelector('#frozen').checked
+    // wandering = settingsMenu.querySelector('#wandering').checked
     drawLines = settingsMenu.querySelector('#lines').checked
     drawParticles = settingsMenu.querySelector('#nodes').checked
 }
@@ -236,7 +262,9 @@ function updateSettingsToForm() {
     settingsMenu.querySelector('#speedMultiplier').value = speedMultiplier
     settingsMenu.querySelector('#nodeSize').value = sizeMultiplier
     settingsMenu.querySelector('#connectionSize').value = lineWidth
-    settingsMenu.querySelector('#notFrozen').checked = !frozen
+
+    settingsMenu.querySelector('#frozen').checked = frozen
+    // settingsMenu.querySelector('#wandering').checked = wandering
     settingsMenu.querySelector('#lines').checked = drawLines
     settingsMenu.querySelector('#nodes').checked = drawParticles
 }

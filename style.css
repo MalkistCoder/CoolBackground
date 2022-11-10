@@ -8,6 +8,8 @@ body {
     -ms-user-select: none; /* IE10+/Edge */
 
     font-family: 'Azret Mono', monospace;
+
+    overflow: hidden;
 }
 
 #canvas {
@@ -82,20 +84,75 @@ a {
     z-index: 2;
 }
 
+@keyframes settings-entrance {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0%);
+    }
+}
+
+@keyframes settings-exit {
+    from {
+        transform: translateY(0%);
+    }
+    to {
+        transform: translateY(-100%);
+    }
+}
+
+@keyframes overlay-entrance {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes overlay-exit {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    /*display: none;*/
+    background-color: rgba(0,0,0,0.6);
+    animation-name: overlay-entrance;
+    animation-duration: 1.5s;
+    animation-timing-function: ease-out;
+
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1.5;
+}
+
 div.settings {
     display: none !important;
 
     position: fixed;
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     top: 0px;
     left: 0px;
 
     color: white;
-    background-color: rgba(0,0,0,0.666);
     text-align: right;
 
     font-size: 125%;
+
+    animation-name: settings-entrance;
+    animation-duration: 1.5s;
+    animation-timing-function: ease-out;
 }
 
 .settings-form {
