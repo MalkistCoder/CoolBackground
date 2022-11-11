@@ -11,7 +11,7 @@
     <body>
         <div class="content" id="content">
             <h1 class="main-header">Cool Background</h1>
-            <p>By: MalkistCoder82 | v1.0.3.1</p>
+            <p>By: MalkistCoder82 | v1.0.4</p>
             <p>Source: <a href="https://github.com/MalkistCoder/CoolBackground">github repo</a></p>
             <h4>Controls</h4>
             <table class="controls">
@@ -60,11 +60,11 @@
                     </tr>
                     <tr>
                         <td>Create Node</td>
-                        <td class="control-key">left click</td>
+                        <td class="control-key">left click or a</td>
                     </tr>
                     <tr>
                         <td>Remove Node</td>
-                        <td class="control-key">right click</td>
+                        <td class="control-key">right click or d</td>
                     </tr>
                 </tbody>
             </table>
@@ -72,7 +72,7 @@
             <h6>Tip: Press F11 to full-screen</h6>
         </div>
         <button type="button" id="settings-button" onclick="toggleSettingsMenu();">Settings</button>
-        <div class="overlay"></div>
+        <div class="overlay" id="overlay"></div>
         <div class="settings">
             <form class="settings-form" oninput="updateSettingsFromForm();">
                 <h1 id="settings-form-heading">Background Settings</h1>
@@ -83,7 +83,7 @@
                                 <label for="speedMultiplier">Speed: </label>
                             </td>
                             <td>
-                                <input type="number" name="speed" id="speedMultiplier" value="1" min="-4" max="6">
+                                <input type="range" name="speed" id="speedMultiplier" value="1" min="-4" max="6">
                             </td>
                         </tr>
                         <tr>
@@ -91,7 +91,7 @@
                                 <label for="nodeSize">Node Size: </label>
                             </td>
                             <td>
-                                <input type="number" name="node-size" id="nodeSize" value="1" min="-8" max="14">
+                                <input type="range" name="node-size" id="nodeSize" value="1" min="-8" max="14">
                             </td>
                         </tr>
                         <tr>
@@ -99,23 +99,49 @@
                                 <label for="connectionSize">Connection Size:</label>
                             </td>
                             <td>
-                                <input type="number" name="connection-size" id="connectionSize" value="5" min="-2" max="16">
+                                <input type="range" name="connection-size" id="connectionSize" value="5" min="-2" max="16">
                             </td>
                         </tr>
                     </table>
                     <h3>Movement:</h3>
-                    <label for="frozen">Frozen</label>
+                    <label for="frozen">Frozen:</label>
                     <input type="checkbox" name="frozen" id="frozen" value="frozen">
                     <br>
                     <!--<label for="wandering">Wandering (BETA)</label>
                     <input type="checkbox" name="wandering" id="wandering" value="wandering">-->
                     <h3>Display</h3>
+                    <label for="targetFPS">Target FPS:</label>
+                    <input type="number" name="target-fps" id="targetFPS" min="15" value="45" max="150" step="5">
+                    <br>
+                    <label for="maxConnections">Connections:</label>
+                    <input type="number" name="max-connections" id="maxConnections" min="1" value="5" max="15" step="2">
                     <br>
                     <label for="lines">Lines:</label>
                     <input type="checkbox" name="lines" id="lines" value="lines" checked>
                     <br>
                     <label for="nodes">Nodes:</label>
                     <input type="checkbox" name="nodes" id="nodes" value="nodes" checked>
+                    <br>
+                    <span>Connection Color:</span>
+                    <select class="line-color" name="line-color" id="connectionColor">
+                        <option value="rgba(255,255,255,">White</option>
+                        <option value="rgba(255,0,0,">Red</option>
+                        <option value="rgba(255,128,0,">Orange</option>
+                        <option value="rgba(255,255,0,">Yellow</option>
+                        <option value="rgba(128,255,0,">Charteuse</option>
+                        <option value="rgba(0,255,0,">Green</option>
+                        <option value="rgba(0,255,128,">Neon Teal</option>
+                        <option value="rgba(0,255,255,">Cyan</option>
+                        <option value="rgba(0,128,255,">Sky</option>
+                        <option value="rgba(0,0,255,">Blue</option>
+                        <option value="rgba(128,0,255,">Purple</option>
+                        <option value="rgba(255,0,255,">Fuschia</option>
+                        <option value="rgba(255,0,128,">Hot Pink</option>
+                        <option value="rainbow" selected>Rainbow</option>
+                    </select>
+                    <br>
+                    <span>Node Color:</span>
+                    <input type="color" name="node-color" id="nodeColor" value="#ffffff">
                 </div>
             </form>
         </div>

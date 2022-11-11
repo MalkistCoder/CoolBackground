@@ -31,14 +31,18 @@ let hue = 0
 let drawLines = true
 let drawParticles = true
 let frozen = false
-// let wandering = false
 
 let sizeMultiplier = 1
 let speedMultiplier = 1
 let lineWidth = 5
-let wanderingFrame = 0
-let targetFPS = 48
+let maxConnections = 3
+let targetFPS = 45
 
+let lineCol = 'rainbow'
+let nodeCol = '#ffffff'
+
+// Variables we will use later
+let connectionsMade = 0
 const twoPointsDist = (ax, ay, bx, by) => Math.sqrt((ax-bx)**2 + (ay-by)**2)
 
 // Main particle/node class
@@ -51,8 +55,8 @@ class Particle {
         this.vy = Math.random() * 2 - 1
     }
     update() {
-        this.x += this.vx * ((5/3)**speedMultiplier)
-        this.y += this.vy * ((5/3)**speedMultiplier)
+        this.x += this.vx * ((5/3)**speedMultiplier) * (48/targetFPS)
+        this.y += this.vy * ((5/3)**speedMultiplier) * (48/targetFPS)
         if (this.x > canvas.width) {
             this.x = canvas.width
             this.vx *= -1
@@ -71,7 +75,7 @@ class Particle {
         }
     }
     draw() {
-        ctx.fillStyle = 'white'
+        ctx.fillStyle = nodeCol
         ctx.beginPath()
         ctx.arc(this.x,this.y,this.size/(1/(1.2**sizeMultiplier)),0,Math.PI*2)
         ctx.fill()
@@ -111,7 +115,7 @@ for (var i = 0; i <= (window.innerWidth * window.innerHeight)*0.000075; i++) { /
 
 // Update the particles
 function updateParticles() {
-    if (!frozen) {
+    if (!frozen && targetFPS >= 1) {
         particles.forEach((particle, unused) => {
             particle.update()
         })
@@ -125,7 +129,8 @@ function updateParticles() {
     }
     if (drawLines) {
         particles.forEach((particle, unused) => {
-            particles.forEach((connection, unused) => {
+            connectionsMade = 0
+            for (var connection of particles) {
                 if (particle != connection || Math.abs(particle.x-connection.x) <= 150 || Math.abs(particle.y-connection.y) <= 150) {
                     let dist = twoPointsDist(particle.x,particle.y,connection.x,connection.y)
                     if (dist < 150) {
@@ -133,11 +138,20 @@ function updateParticles() {
                         ctx.beginPath()
                         ctx.moveTo(particle.x, particle.y)
                         ctx.lineTo(connection.x, connection.y)
-                        ctx.strokeStyle = `hsla(${hue},100%,${(100-(100*dist/300))}%,${1-(dist/150)})`
+                        if (lineCol == 'rainbow') {
+                            ctx.strokeStyle = `hsla(${hue},100%,${(100-(100*dist/300))}%,${1-(dist/150)})`
+                        } else {
+                            ctx.strokeStyle = lineCol + String(1-(dist/150)) + ')'
+                        }
                         ctx.stroke()
+                        if (connectionsMade > maxConnections) {
+                            break
+                        } else {
+                            connectionsMade++
+                        }
                     }
                 }
-            })
+            }
         })
     }
     if (drawParticles) {
@@ -161,6 +175,15 @@ document.addEventListener('keypress', function(e) {
         drawParticles = !drawParticles
     } else if (e.key == 's') {
         frozen = !frozen
+    } else if (e.key == 'a') {
+        particles.push(new Particle(mouse.x,mouse.y))
+    } else if (e.key == 'd') {
+        particles.sort((a,b) => {
+            return twoPointsDist(mouse.x,mouse.y,a.x,a.y) - twoPointsDist(mouse.x,mouse.y,b.x,b.y)
+        })
+        if (Math.abs(twoPointsDist(mouse.x,mouse.y,particles[0].x,particles[0].y)) <= 17 + particles[0].size * sizeMultiplier) {
+            particles.shift()
+        }
     } else if (e.key == '.' && speedMultiplier < 6) {
         speedMultiplier++
     } else if (e.key == ',' && speedMultiplier > -4) {
@@ -215,8 +238,12 @@ function animate() {
 function toggleTitle() {
     const title = document.getElementById('content')
     if (title.style.display != "none") {
-        title.style.display = "none"
+        title.style.setProperty('animation-name', 'title-exit')
+        setTimeout(function () {
+            title.style.display = "none"
+        }, 999);
     } else {
+        title.style.setProperty('animation-name', 'title-entrance')
         title.style.display = "block"
     }
 }
@@ -225,13 +252,15 @@ function toggleSettingsMenu() {
     const overlay = document.getElementsByClassName('overlay')[0]
     const settingsMenu = document.getElementsByClassName('settings')[0]
     if (settingsMenu.style.display == "inline-block") {
+        settingsMenu.style.setProperty('animation-timing-function', 'ease-in')
         settingsMenu.style.setProperty('animation-name', 'settings-exit')
         overlay.style.setProperty('animation-name', 'overlay-exit')
         setTimeout(function () {
             settingsMenu.style.setProperty('display', 'none', 'important')
             overlay.style.setProperty('display', 'none')
-        }, 1500)
+        }, 1450) // To prevent flicker, the duration is cut down slightly.
     } else {
+        settingsMenu.style.setProperty('animation-timing-function', 'ease-out')
         settingsMenu.style.setProperty('animation-name', 'settings-entrance')
         overlay.style.setProperty('animation-name', 'overlay-entrance')
         settingsMenu.style.setProperty('display', 'inline-block', 'important')
@@ -241,7 +270,7 @@ function toggleSettingsMenu() {
     const title = document.getElementById('content')
     console.log(title.style.display)
     if (title.style.display != "none") {
-        title.style.display = "none"
+        toggleTitle()
     }
 }
 
@@ -252,9 +281,13 @@ function updateSettingsFromForm() {
     lineWidth = settingsMenu.querySelector('#connectionSize').value
 
     frozen = settingsMenu.querySelector('#frozen').checked
-    // wandering = settingsMenu.querySelector('#wandering').checked
+    targetFPS = settingsMenu.querySelector('#targetFPS').value
+    maxConnections = settingsMenu.querySelector('#maxConnections').value
     drawLines = settingsMenu.querySelector('#lines').checked
     drawParticles = settingsMenu.querySelector('#nodes').checked
+
+    lineCol = settingsMenu.querySelector('#connectionColor').value
+    nodeCol = settingsMenu.querySelector('#nodeColor').value
 }
 
 function updateSettingsToForm() {
@@ -264,10 +297,14 @@ function updateSettingsToForm() {
     settingsMenu.querySelector('#connectionSize').value = lineWidth
 
     settingsMenu.querySelector('#frozen').checked = frozen
-    // settingsMenu.querySelector('#wandering').checked = wandering
     settingsMenu.querySelector('#lines').checked = drawLines
     settingsMenu.querySelector('#nodes').checked = drawParticles
 }
 
 // Start
 animate()
+setTimeout(function () {
+    const overlay = document.querySelector('#overlay')
+    overlay.style.setProperty('display', 'none')
+    overlay.style.setProperty('animation-name', 'overlay-entrance')
+}, 1450)

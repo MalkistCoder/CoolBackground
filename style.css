@@ -22,12 +22,43 @@ body {
     z-index: -1;
 }
 
+@keyframes title-entrance {
+    from {
+
+        opacity: 0;
+        transform: scale(0.333) translate(-50%, -50%);
+        transform-origin: top left; /* I have no idea why this is top left. All I know is that it works, so I'm keeping it. */
+    }
+    to {
+
+        opacity: 1;
+        transform: scale(1) translate(-50%, -50%);
+        transform-origin: top left; /* I have no idea why this is top left. All I know is that it works, so I'm keeping it. */
+    }
+}
+
+@keyframes title-exit {
+    from {
+
+        opacity: 1;
+        transform: scale(1) translate(-50%, -50%);
+        transform-origin: top left; /* I have no idea why this is top left. All I know is that it works, so I'm keeping it. */
+    }
+    to {
+
+        opacity: 0;
+        transform: scale(0.333) translate(-50%, -50%);
+        transform-origin: top left; /* I have no idea why this is top left. All I know is that it works, so I'm keeping it. */
+    }
+}
+
 .content {
     /* Center text */
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    transform-origin: center;
 
     color: white;
     background-color: #505050a0;
@@ -40,6 +71,11 @@ body {
 
     /* all lowercase cuz looks cooler B) */
     text-transform: lowercase;
+
+    animation-name: title-entrance;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-direction: alternate;
 }
 
 .controls {
@@ -82,6 +118,14 @@ a {
     left: 100%;
     transform: translateX(-110%);
     z-index: 2;
+
+    background: transparent;
+    color: white;
+    font-family: 'Azret Mono', monospace;
+
+    border-style: solid;
+    border-color: white;
+    border-radius: 5px;
 }
 
 @keyframes settings-entrance {
@@ -99,6 +143,19 @@ a {
     }
     to {
         transform: translateY(-100%);
+    }
+}
+
+@keyframes overlay-first-load {
+    from {
+        opacity: 1;
+        z-index: 999;
+        background-color: rgba(0, 0, 0, 1);
+    }
+    to {
+        opacity: 0;
+        z-index: 999;
+        background-color: rgba(0, 0, 0, 1);
     }
 }
 
@@ -121,11 +178,10 @@ a {
 }
 
 .overlay {
-    display: none;
+    display: block;
     position: fixed;
-    /*display: none;*/
     background-color: rgba(0,0,0,0.6);
-    animation-name: overlay-entrance;
+    animation-name: overlay-first-load;
     animation-duration: 1.5s;
     animation-timing-function: ease-out;
 
@@ -158,9 +214,9 @@ div.settings {
 .settings-form {
     position: absolute;
     display: inline-block;
-    top: 5%;
+    top: 38%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%,-50%);
     text-align: center;
 }
 
@@ -172,16 +228,11 @@ div.settings {
 
 #settings-form-table {
     text-align: right;
-
-    border-style: solid;
-    border-radius: 10px;
-    border-color: #ffffff60;
-    border-spacing: medium;
 }
 
-input {
+input, select {
     background: transparent;
-    width: 50px;
+    width: 130px;
 
     border-style: solid;
     border-radius: 5px;
@@ -189,4 +240,10 @@ input {
 
     color: white !important;
     font-family: 'Azret Mono', monospace;
+}
+
+/* https://stackoverflow.com/questions/12836227/change-select-box-option-background-color */
+select option {
+    color: black;
+    font-weight: 525;
 }
