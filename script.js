@@ -35,7 +35,7 @@ let frozen = false
 let sizeMultiplier = 1
 let speedMultiplier = 1
 let lineWidth = 5
-let maxConnections = 3
+let maxConnections = 9
 let targetFPS = 45
 
 let lineCol = 'rainbow'
@@ -53,6 +53,7 @@ class Particle {
         this.size = Math.random() * 4 + 2
         this.vx = Math.random() * 2 - 1
         this.vy = Math.random() * 2 - 1
+        this.reachedMaxConnections = false
     }
     update() {
         this.x += this.vx * ((5/3)**speedMultiplier) * (48/targetFPS)
@@ -91,11 +92,12 @@ class Particle {
         this.vx = Math.sin(aRad) * vel * -1
         this.vy = Math.cos(aRad) * vel * -1
     }
-    /*
+
     wander() {
-        this.angle += 10
+        this.vx += ((Math.random()-0.5)/10)
+        this.vy += ((Math.random()-0.5)/10)
     }
-    */
+
     get vel() {
         return Math.sqrt((this.vx*this.vx)+(this.vy*this.vy))
     }
@@ -115,16 +117,19 @@ for (var i = 0; i <= (window.innerWidth * window.innerHeight)*0.000075; i++) { /
 
 // Update the particles
 function updateParticles() {
+    particles.forEach((particle, unused) => {
+        particle.reachedMaxConnections = false
+    });
+
     if (!frozen && targetFPS >= 1) {
         particles.forEach((particle, unused) => {
             particle.update()
         })
         /*
-        if (wandering && wanderingFrame >= 5) {
-            particles.forEach((particle, i) => {
-                particle.wander()
-            });
-            wanderingFrame = 0
+        particles.forEach((particle, i) => {
+            particle.wander()
+        });
+        wanderingFrame = 0
         */
     }
     if (drawLines) {
@@ -133,7 +138,7 @@ function updateParticles() {
             for (var connection of particles) {
                 if (particle != connection || Math.abs(particle.x-connection.x) <= 150 || Math.abs(particle.y-connection.y) <= 150) {
                     let dist = twoPointsDist(particle.x,particle.y,connection.x,connection.y)
-                    if (dist < 150) {
+                    if (dist < 150 && !connection.reachedMaxConnections) {
                         ctx.lineWidth = 3/10*(1.5**lineWidth)
                         ctx.beginPath()
                         ctx.moveTo(particle.x, particle.y)
@@ -144,7 +149,7 @@ function updateParticles() {
                             ctx.strokeStyle = lineCol + String(1-(dist/150)) + ')'
                         }
                         ctx.stroke()
-                        if (connectionsMade > maxConnections) {
+                        if (connectionsMade >= maxConnections) {
                             break
                         } else {
                             connectionsMade++
@@ -152,6 +157,7 @@ function updateParticles() {
                     }
                 }
             }
+            particle.reachedMaxConnections = true
         })
     }
     if (drawParticles) {
