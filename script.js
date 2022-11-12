@@ -31,6 +31,7 @@ let hue = 0
 let drawLines = true
 let drawParticles = true
 let frozen = false
+let lightMode = false
 
 let sizeMultiplier = 1
 let speedMultiplier = 1
@@ -144,7 +145,7 @@ function updateParticles() {
                         ctx.moveTo(particle.x, particle.y)
                         ctx.lineTo(connection.x, connection.y)
                         if (lineCol == 'rainbow') {
-                            ctx.strokeStyle = `hsla(${hue},100%,${(100-(100*dist/300))}%,${1-(dist/150)})`
+                            ctx.strokeStyle = `hsla(${hue},100%,${((lightMode ? 0 : 100)-(100*dist/300))}%,${1-(dist/150)})`
                         } else {
                             ctx.strokeStyle = lineCol + String(1-(dist/150)) + ')'
                         }
@@ -164,6 +165,9 @@ function updateParticles() {
         particles.forEach((particle, i) => {
             particle.draw()
         })
+    }
+    if (lineCol == 'rainbow') {
+        hue++
     }
 }
 
@@ -231,10 +235,12 @@ canvas.addEventListener('mousedown', function(e) {
 // Animate stuff
 function animate() {
     ctx.clearRect(0,0,canvas.width,canvas.height)
+    if (lightMode) {
+        ctx.fillStyle = 'white'
+        ctx.fillRect(0,0,canvas.width,canvas.height)
+    }
     updateParticles()
-    hue = (hue + 1) % 360
     // Call again so it loops forever
-    // BUG: different speeds on different refresh rates
     setTimeout(function () {
         requestAnimationFrame(animate)
     }, 1000/targetFPS);
@@ -294,6 +300,7 @@ function updateSettingsFromForm() {
 
     lineCol = settingsMenu.querySelector('#connectionColor').value
     nodeCol = settingsMenu.querySelector('#nodeColor').value
+    lightMode = settingsMenu.querySelector('#lightMode').checked
 }
 
 function updateSettingsToForm() {
